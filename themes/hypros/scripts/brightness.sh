@@ -6,11 +6,11 @@ device="amdgpu_bl0"
 # Retrieve max value of the device
 max_value=$(brightnessctl -d $device max)
 
-# Get the brightness value as an integer
+# Get the brightness value as a percentage
 get_value () {
     local value=$(brightnessctl -d "$device" get)
-    local percentage=$(echo "scale=2; $value/$max_value*100" | bc)
-    local rounded_percentage=$(echo "($percentage+0.5)/1" | bc)
+    local percentage=$(echo "scale=2; $value / $max_value * 100" | bc)
+    local rounded_percentage=$(echo "($percentage + 0.5) / 1" | bc)
 
     echo $rounded_percentage
 }

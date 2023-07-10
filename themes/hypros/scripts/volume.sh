@@ -1,26 +1,25 @@
 #!/bin/bash
+set -e
 
-# Get the volume level as integer
+limit=1.5
+
+# Get the volume value as a percentage
 get_value () {
-    # Get the volume from wpctl and extract the value
-    local wpctl_output=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | grep -oE '[0-9]+([.][0-9]+)?')
-    # Multiply the value by 100
-    local float_level=$(echo "$wpctl_output * 100" | bc)
-    # Cast it to an integer
-    local int_level=$(printf "%.0f" "$float_level")
+    local value=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | grep -oE '[0-9]+([.][0-9]+)?')
+    local percentage=$(echo "scale=2; $value / $limit * 100" | bc)
+    local rounded_percentage=$(echo "($percentage + 0.5) / 1" | bc)
 
-    # return the integer
-    echo $int_level
+    echo $rounded_percentage
 }
 
 # Check argument to know what to do
 if [ $1 == "up" ]; then
     # Increase volume by 10%
-    wpctl set-volume -l 2.0 @DEFAULT_AUDIO_SINK@ 10%+
+    wpctl set-volume -l "$limit" @DEFAULT_AUDIO_SINK@ 10%+
 fi
 if [ $1 == "down" ]; then
     # Decrease volume by 10%
-    wpctl set-volume -l 2.0 @DEFAULT_AUDIO_SINK@ 10%-
+    wpctl set-volume -l "$limit" @DEFAULT_AUDIO_SINK@ 10%-
 fi
 
 # Retrieve the new volume level
