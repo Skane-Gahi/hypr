@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Get the volume level as integer
-get_level () {
+get_value () {
     # Get the volume from wpctl and extract the value
     local wpctl_output=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | grep -oE '[0-9]+([.][0-9]+)?')
     # Multiply the value by 100
@@ -24,7 +24,7 @@ if [ $1 == "down" ]; then
 fi
 
 # Retrieve the new volume level
-volume_level=$(get_level)
+volume_value=$(get_value)
 
 # Check if the widget is already opened
 eww_window=$(eww windows | grep "volume")
@@ -32,16 +32,16 @@ is_opened=${eww_window:0:1}
 
 # Open the widget if not opened
 if [ "$is_opened" == "v" ]; then
-    eww open volume
+    eww open volume-control
 fi
 # Update the eww variable
-eww update volume-level=$volume_level
+eww update volume-value=$volume_value
 
 # Wait 2 secs
 sleep 2
 # Check if the volume has changed
-new_volume_level=$(get_level)
+new_volume_value=$(get_value)
 # If not, close the widget
-if [ "$new_volume_level" == "$volume_level" ]; then
-    eww close volume
+if [ "$new_volume_value" == "$volume_value" ]; then
+    eww close volume-control
 fi
